@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_instagram_clone/src/components/avatar_widget.dart';
 import 'package:flutter_instagram_clone/src/components/image_data.dart';
+import 'package:flutter_instagram_clone/src/components/post_widget.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -38,7 +39,7 @@ class Home extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(children: [
-        const SizedBox(width: 20),
+        const SizedBox(width: 10),
         _myStory(),
         const SizedBox(width: 5),
         ...List.generate(
@@ -48,6 +49,12 @@ class Home extends StatelessWidget {
                 thumbPath:
                     'https://i.ytimg.com/vi/_ulvHOhIsqc/maxresdefault.jpg')),
       ]),
+    );
+  }
+
+  Widget _postList() {
+    return Column(
+      children: List.generate(50, (index) => const PostWidget()),
     );
   }
 
@@ -63,7 +70,7 @@ class Home extends StatelessWidget {
           GestureDetector(
             onTap: () {},
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(10.0),
               child: ImageData(
                 IconsPath.directMessage,
                 width: 50,
@@ -76,6 +83,7 @@ class Home extends StatelessWidget {
       body: ListView(
         children: [
           _storyBoardList(),
+          _postList(),
         ],
       ),
     );
