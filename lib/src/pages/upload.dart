@@ -1,16 +1,77 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_instagram_clone/src/components/image_data.dart';
-import 'package:get/get.dart';
+import 'package:photo_manager/photo_manager.dart';
 
-class Upload extends StatelessWidget {
+class Upload extends StatefulWidget {
   const Upload({super.key});
 
+  @override
+  State<Upload> createState() => _UploadState();
+}
+
+class _UploadState extends State<Upload> {
+  var albums = <AssetPathEntity>[];
+  var imageList = <AssetEntity>[];
+  var headerTitle = '';
+  AssetEntity? selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPhotos();
+  }
+
+  void _loadPhotos() async {
+    var result = await PhotoManager.requestPermissionExtend();
+    if (result.isAuth) {
+      // 권한이 있으면 실행
+      albums = await PhotoManager.getAssetPathList(
+        type: RequestType.image,
+        filterOption: FilterOptionGroup(
+          imageOption: const FilterOption(
+            sizeConstraint: SizeConstraint(minHeight: 100, minWidth: 100),
+          ),
+          orders: [
+            const OrderOption(type: OrderOptionType.createDate, asc: false),
+          ],
+        ),
+      );
+      _loadData();
+    } else {
+      // 권한이 없으면 권한 요청 메시지
+    }
+  }
+
+  void _loadData() async {
+    headerTitle = albums.first.name;
+    await _pagingPhotos();
+    update();
+  }
+
+  Future<void> _pagingPhotos() async {
+    var photos = await albums.first.getAssetListPaged(page: 0, size: 30);
+    imageList.addAll(photos);
+    selectedImage = imageList.first;
+  }
+
+  void update() => setState(() {});
+
   Widget _imagePreview() {
+    var width = MediaQuery.of(context).size.width;
+
     return Container(
-      width: Get.width,
-      height: Get.width,
-      color: Colors.grey,
-    );
+        width: width,
+        height: width,
+        color: Colors.grey,
+        child: selectedImage == null
+            ? Container()
+            : _photoWidget(selectedImage!, width.toInt(), builder: (data) {
+                return Image.memory(
+                  data,
+                  fit: BoxFit.cover,
+                );
+              }));
   }
 
   Widget _header() {
@@ -22,15 +83,15 @@ class Upload extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(5.0),
             child: Row(
-              children: const [
+              children: [
                 Text(
-                  '갤러리',
-                  style: TextStyle(
+                  headerTitle,
+                  style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,
                   ),
                 ),
-                Icon(Icons.arrow_drop_down)
+                const Icon(Icons.arrow_drop_down)
               ],
             ),
           ),
@@ -83,11 +144,30 @@ class Upload extends StatelessWidget {
             childAspectRatio: 1, // 1로 지정하면 정사각형 모양
             mainAxisSpacing: 1,
             crossAxisSpacing: 1),
-        itemCount: 100,
+        itemCount: imageList.length,
         itemBuilder: (BuildContext context, int index) {
-          return Container(
-            color: Colors.red,
-          );
+          return _photoWidget(imageList[index], 200, builder: (data) {
+            return Opacity(
+              opacity: imageList[index] == selectedImage ? 0.3 : 1,
+              child: Image.memory(
+                data,
+                fit: BoxFit.cover,
+              ),
+            );
+          });
+        });
+  }
+
+  Widget _photoWidget(AssetEntity asset, int size,
+      {required Widget Function(Uint8List) builder}) {
+    return FutureBuilder(
+        future: asset.thumbnailDataWithSize(ThumbnailSize(size, size)),
+        builder: (_, AsyncSnapshot<Uint8List?> snapshot) {
+          if (snapshot.hasData) {
+            return builder(snapshot.data!);
+          } else {
+            return Container();
+          }
         });
   }
 
