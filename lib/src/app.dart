@@ -17,7 +17,15 @@ class App extends GetView<BottomNavController> {
         () => Scaffold(
           body: IndexedStack(index: controller.pageIndex.value, children: [
             const Home(),
-            const Search(),
+            // 중첩 라우팅 관리를 위한 Navigator 설정
+            Navigator(
+              key: controller.searchPageNavigationKey,
+              onGenerateRoute: (routeSetting) {
+                return MaterialPageRoute(
+                  builder: (context) => const Search(),
+                );
+              },
+            ),
             Container(
               child: Center(child: Text("UPLOAD")),
             ),

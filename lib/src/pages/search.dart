@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_instagram_clone/src/pages/search/search_focus.dart';
 import 'package:get/get.dart';
 import 'package:quiver/iterables.dart';
 
@@ -40,21 +41,29 @@ class _SearchState extends State<Search> {
     return Row(
       children: [
         Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-            margin: const EdgeInsets.only(left: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(6),
-              color: const Color(0xffefefef),
-            ),
-            child: Row(
-              children: const [
-                Icon(Icons.search),
-                Text(
-                  '검색',
-                  style: TextStyle(fontSize: 15, color: Color(0xff838383)),
-                )
-              ],
+          child: GestureDetector(
+            onTap: () {
+              // App.dart에서 설정한 중첩 라우팅 관리를 사용하기 위해 Get.to()가 아닌 Navigator.push() 사용
+              // GetX를 사용한 중첩 라우팅도 있다고 함 (나중에 공부해볼 예정, 근데 버그가 좀 있는듯?)
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const SearchFocus()));
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+              margin: const EdgeInsets.only(left: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(6),
+                color: const Color(0xffefefef),
+              ),
+              child: Row(
+                children: const [
+                  Icon(Icons.search),
+                  Text(
+                    '검색',
+                    style: TextStyle(fontSize: 15, color: Color(0xff838383)),
+                  )
+                ],
+              ),
             ),
           ),
         ),
