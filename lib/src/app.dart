@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_instagram_clone/src/controller/bottom_nav_controller.dart';
 import 'package:flutter_instagram_clone/src/pages/active_history.dart';
 import 'package:flutter_instagram_clone/src/pages/home.dart';
+import 'package:flutter_instagram_clone/src/pages/my_page.dart';
 import 'package:flutter_instagram_clone/src/pages/search.dart';
 import 'package:get/get.dart';
 
@@ -16,21 +17,24 @@ class App extends GetView<BottomNavController> {
       onWillPop: controller.willPopAction,
       child: Obx(
         () => Scaffold(
-          body: IndexedStack(index: controller.pageIndex.value, children: [
-            const Home(),
-            // 중첩 라우팅 관리를 위한 Navigator 설정
-            Navigator(
-              key: controller.searchPageNavigationKey,
-              onGenerateRoute: (routeSetting) {
-                return MaterialPageRoute(
-                  builder: (context) => const Search(),
-                );
-              },
-            ),
-            Container(),
-            const ActiveHistory(),
-            Center(child: Text("MYPAGE")),
-          ]),
+          body: IndexedStack(
+            index: controller.pageIndex.value,
+            children: [
+              const Home(),
+              // 중첩 라우팅 관리를 위한 Navigator 설정
+              Navigator(
+                key: controller.searchPageNavigationKey,
+                onGenerateRoute: (routeSetting) {
+                  return MaterialPageRoute(
+                    builder: (context) => const Search(),
+                  );
+                },
+              ),
+              Container(),
+              const ActiveHistory(),
+              const MyPage(),
+            ],
+          ),
           bottomNavigationBar: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               showSelectedLabels: false,
