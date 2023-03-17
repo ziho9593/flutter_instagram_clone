@@ -16,8 +16,8 @@ class AuthController extends GetxController {
     // DB 조회
     var userData = await UserRepository.loginUserByUid(uid);
     if (userData != null) {
-      InitBinding.additionalBinding();
       user(userData);
+      InitBinding.additionalBinding();
     }
     return userData;
   }
@@ -29,7 +29,6 @@ class AuthController extends GetxController {
       var task = uploadXFile(thumnail,
           '${signupUser.uid}/profile.${thumnail.path.split('.').last}');
       task.snapshotEvents.listen((event) async {
-        print(event.bytesTransferred);
         if (event.bytesTransferred == event.totalBytes &&
             event.state == TaskState.success) {
           var downloadUrl = await event.ref.getDownloadURL();
