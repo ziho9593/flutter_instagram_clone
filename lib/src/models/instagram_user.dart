@@ -29,4 +29,18 @@ class InstaUser {
       'description': description,
     };
   }
+
+  InstaUser copyWith({
+    String? uid,
+    String? nickname,
+    String? thumbnail,
+    String? description,
+  }) {
+    return InstaUser(
+      uid: uid ?? this.uid,
+      nickname: nickname ?? this.nickname,
+      thumbnail: thumbnail ?? this.thumbnail,
+      description: description ?? this.description,
+    );
+  }
 }
