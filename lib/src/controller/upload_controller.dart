@@ -1,5 +1,13 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_instagram_clone/src/pages/upload/upload_description.dart';
 import 'package:get/get.dart';
 import 'package:photo_manager/photo_manager.dart';
+import 'package:path/path.dart';
+import 'package:image/image.dart' as imageLib;
+import 'package:photofilters/filters/preset_filters.dart';
+import 'package:photofilters/widgets/photo_filter.dart';
 
 class UploadController extends GetxController {
   var albums = <AssetPathEntity>[];
@@ -11,6 +19,7 @@ class UploadController extends GetxController {
     width: 0,
     height: 0,
   ).obs;
+  File? filteredImage;
 
   @override
   void onInit() {
@@ -58,5 +67,29 @@ class UploadController extends GetxController {
   changeAlbum(AssetPathEntity album) async {
     headerTitle(album.name);
     await _pagingPhotos(album);
+  }
+
+  void gotoImageFilter() async {
+    var file = await selectedImage.value.file;
+    var fileName = basename(file!.path);
+    var image = imageLib.decodeImage(file.readAsBytesSync());
+    image = imageLib.copyResize(image!, width: 1000);
+    var imagefile = await Navigator.push(
+      Get.context!,
+      MaterialPageRoute(
+        builder: (context) => PhotoFilterSelector(
+          title: const Text("Photo Filter Example"),
+          image: image!,
+          filters: presetFiltersList,
+          filename: fileName,
+          loader: const Center(child: CircularProgressIndicator()),
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+    if (imagefile != null && imagefile.containsKey('image_filtered')) {
+      filteredImage = imagefile['image_filtered'];
+      Get.to(() => const UploadDescription());
+    }
   }
 }
